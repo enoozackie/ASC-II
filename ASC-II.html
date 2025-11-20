@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Function Visualizer - Step by Step</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        main {
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1.2em;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #5e72e4;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(94, 114, 228, 0.4);
+        }
+
+        .steps-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #5e72e4;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .step h3 {
+            color: #5e72e4;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .step-content {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .formula {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .highlight {
+            background: #ffeaa7;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .char-breakdown {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .char-box {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 60px;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .char-box .char {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .char-box .value {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.3em;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result-box .final-index {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .table-visualization {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .hash-table {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .hash-slot {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .hash-slot.highlighted {
+            background: #ffeaa7;
+            border-color: #fdcb6e;
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(253, 203, 110, 0.4);
+        }
+
+        .slot-index {
+            font-weight: bold;
+            color: #5e72e4;
+            margin-bottom: 5px;
+        }
+
+        .explanation {
+            background: #e7f3ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .explanation h3 {
+            color: #5e72e4;
+            margin-bottom: 15px;
+        }
+
+        .explanation ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔢 Hash Function Visualizer</h1>
+            <p>See exactly how strings are converted to hash table indices</p>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <div class="input-group">
+                    <input type="text" id="inputString" placeholder="Enter any string to hash..." value="apple">
+                    <input type="number" id="tableSize" placeholder="Table Size" value="10" min="2" max="100">
+                    <button class="btn-primary" onclick="visualizeHash()">Hash It!</button>
+                </div>
+            </section>
+
+            <section class="steps-container" id="stepsContainer">
+                <!-- Steps will be generated here -->
+            </section>
+
+            <section class="table-visualization">
+                <h2>Hash Table Visualization</h2>
+                <div class="hash-table" id="hashTable">
+                    <!-- Hash table slots will be generated here -->
+                </div>
+            </section>
+
+            <section class="explanation">
+                <h3>📚 How the Hash Function Works</h3>
+                <ul>
+                    <li><strong>Step 1:</strong> Each character is converted to its ASCII value</li>
+                    <li><strong>Step 2:</strong> All ASCII values are summed together</li>
+                    <li><strong>Step 3:</strong> The sum is divided by the table size</li>
+                    <li><strong>Step 4:</strong> The remainder (modulo) becomes the hash index</li>
+                    <li><strong>Why Modulo?</strong> It ensures the result is always within the table bounds (0 to tableSize-1)</li>
+                    <li><strong>Collisions:</strong> Different strings can produce the same hash index!</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <p>Interactive Hash Function Visualizer - Understanding Modulo Operations</p>
+        </footer>
+    </div>
+
+    <script>
+        function visualizeHash() {
+            const inputString = document.getElementById('inputString').value || 'apple';
+            const tableSize = parseInt(document.getElementById('tableSize').value) || 10;
+            
+            // Clear previous results
+            const stepsContainer = document.getElementById('stepsContainer');
+            stepsContainer.innerHTML = '';
+            
+            // Step 1: Convert string to character array with ASCII values
+            const step1 = createStep('Step 1: Convert Each Character to ASCII');
+            const charBreakdown = document.createElement('div');
+            charBreakdown.className = 'char-breakdown';
+            
+            let totalSum = 0;
+            const charDetails = [];
+            
+            for (let i = 0; i < inputString.length; i++) {
+                const char = inputString[i];
+                const asciiValue = char.charCodeAt(0);
+                totalSum += asciiValue;
+                charDetails.push({ char, asciiValue });
+                
+                const charBox = document.createElement('div');
+                charBox.className = 'char-box';
+                charBox.innerHTML = `
+                    <div class="char">'${char}'</div>
+                    <div class="value">${asciiValue}</div>
+                `;
+                charBreakdown.appendChild(charBox);
+            }
+            
+            step1.appendChild(charBreakdown);
+            stepsContainer.appendChild(step1);
+            
+            // Step 2: Sum all ASCII values
+            const step2 = createStep('Step 2: Sum All ASCII Values');
+            const sumFormula = document.createElement('div');
+            sumFormula.className = 'formula';
+            sumFormula.innerHTML = `
+                ${charDetails.map(d => d.asciiValue).join(' + ')} = <span class="highlight">${totalSum}</span>
+            `;
+            step2.appendChild(sumFormula);
+            stepsContainer.appendChild(step2);
+            
+            // Step 3: Apply modulo operation
+            const step3 = createStep('Step 3: Apply Modulo Operation');
+            const moduloFormula = document.createElement('div');
+            moduloFormula.className = 'formula';
+            const remainder = totalSum % tableSize;
+            moduloFormula.innerHTML = `
+                ${totalSum} % ${tableSize} = <span class="highlight">${remainder}</span>
+            `;
+            step3.appendChild(moduloFormula);
+            
+            const explanation = document.createElement('div');
+            explanation.className = 'step-content';
+            explanation.innerHTML = `
+                <p><strong>${totalSum}</strong> divided by <strong>${tableSize}</strong> equals <strong>${Math.floor(totalSum / tableSize)}</strong> with a remainder of <strong>${remainder}</strong></p>
+                <p>This remainder <span class="highlight">${remainder}</span> is our final hash index!</p>
+            `;
+            step3.appendChild(explanation);
+            stepsContainer.appendChild(step3);
+            
+            // Final result
+            const resultBox = document.createElement('div');
+            resultBox.className = 'result-box';
+            resultBox.innerHTML = `
+                <div>Final Hash Index for "${inputString}"</div>
+                <div class="final-index">${remainder}</div>
+            `;
+            stepsContainer.appendChild(resultBox);
+            
+            // Update hash table visualization
+            updateHashTable(tableSize, remainder);
+        }
+        
+        function createStep(title) {
+            const step = document.createElement('div');
+            step.className = 'step';
+            const h3 = document.createElement('h3');
+            h3.textContent = title;
+            step.appendChild(h3);
+            return step;
+        }
+        
+        function updateHashTable(tableSize, highlightIndex) {
+            const hashTable = document.getElementById('hashTable');
+            hashTable.innerHTML = '';
+            hashTable.style.gridTemplateColumns = `repeat(${tableSize}, 1fr)`;
+            
+            for (let i = 0; i < tableSize; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'hash-slot';
+                if (i === highlightIndex) {
+                    slot.classList.add('highlighted');
+                }
+                
+                slot.innerHTML = `
+                    <div class="slot-index">[${i}]</div>
+                    <div>${i === highlightIndex ? '✓' : ''}</div>
+                `;
+                
+                hashTable.appendChild(slot);
+            }
+        }
+        
+        // Allow Enter key to hash
+        document.getElementById('inputString').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                visualizeHash();
+            }
+        });
+        
+        document.getElementById('tableSize').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                visualizeHash();
+            }
+        });
+        
+        // Initialize with default value
+        window.onload = function() {
+            visualizeHash();
+        };
+    </script>
+</body>
+</html>
